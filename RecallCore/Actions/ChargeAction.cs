@@ -1,3 +1,5 @@
+using RecallCore.Entities;
+
 namespace RecallCore.Actions
 {
     public class ChargeAction : IAction
@@ -5,9 +7,9 @@ namespace RecallCore.Actions
         public string Name => "Charge";
         public int Cost => 1;
 
-        public void Execute(RecallCore.Entities.Player self, RecallCore.Entities.Player target)
+        public void Execute(Actor self, Actor target)
         {
-            self.AP += 2;
+            self.ActionPoints += 2;
         }
     }
 } 

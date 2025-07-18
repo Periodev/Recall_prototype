@@ -1,39 +1,36 @@
-# ---- Godot ----
-.import/
-export.cfg
-export_presets.cfg
-*.translation
-*.import
-*.godot
-
-# ---- Mono / .NET ----
-# Build folders
-[Bb]in/
-[Oo]bj/
-# NuGet packages
-*.nupkg
-*.snupkg
-*.nuspec
+# ---- Build artifacts ----
+bin/
+obj/
 *.dll
 *.exe
 *.pdb
 *.cache
 *.log
 
-# Rider / VSCode
+# ---- IDE settings ----
 .idea/
 .vscode/
 *.user
+*.vs/
+
+# ---- NuGet ----
+*.nupkg
+*.snupkg
+*.nuspec
+project.assets.json
+project.nuget.cache
+*.nuget.dgspec.json
+
+# ---- Godot specific ----
+.import/
+export.cfg
+export_presets.cfg
+*.translation
+*.import
+*.godot
+.cache/
+
+# ---- Others ----
 *.suo
 *.csproj.user
-*.vs/
 *.sln.iml
-
-# Temp / OS
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Others
-*.tmp
-*.bak

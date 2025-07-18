@@ -1,3 +1,5 @@
+using RecallCore.Entities;
+
 namespace RecallCore.Actions
 {
     public class AttackAction : IAction
@@ -5,10 +7,10 @@ namespace RecallCore.Actions
         public string Name => "Attack";
         public int Cost => 2;
 
-        public void Execute(RecallCore.Entities.Player self, RecallCore.Entities.Player target)
+        public void Execute(Actor self, Actor target)
         {
             int damage = 5;
-            target.HP -= damage;
+            target.TakeDamage(damage);
         }
     }
 } 
