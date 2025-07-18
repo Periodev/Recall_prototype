@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using RecallCore.Memory;
 
 namespace RecallCore.Memory
 {
