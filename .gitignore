@@ -1,0 +1,39 @@
+# ---- Godot ----
+.import/
+export.cfg
+export_presets.cfg
+*.translation
+*.import
+*.godot
+
+# ---- Mono / .NET ----
+# Build folders
+[Bb]in/
+[Oo]bj/
+# NuGet packages
+*.nupkg
+*.snupkg
+*.nuspec
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+
+# Rider / VSCode
+.idea/
+.vscode/
+*.user
+*.suo
+*.csproj.user
+*.vs/
+*.sln.iml
+
+# Temp / OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Others
+*.tmp
+*.bak
