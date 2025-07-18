@@ -8,7 +8,8 @@ namespace RecallCore.Entities
 
         public string DecideAction()
         {
-            return rng.Next(0, 2) == 0 ? "Attack" : "Idle";
+            var actions = new[] { "Attack", "Block", "Charge" };
+            return actions[rng.Next(actions.Length)];
         }
     }
 }
