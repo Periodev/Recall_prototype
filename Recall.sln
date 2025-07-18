@@ -3,6 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecallConsole", "RecallConsole\RecallConsole.csproj", "{6E54C66A-1BD5-4EC4-8DE6-F0A44BC1B91B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecallCore", "RecallCore\RecallCore.csproj", "{0A13A593-D466-4F8D-8664-F4CEA5AA4A6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecallTests", "RecallTests\RecallTests.csproj", "{2BFA0676-B2AA-462F-94FE-614FD332F0C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -10,5 +16,19 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6E54C66A-1BD5-4EC4-8DE6-F0A44BC1B91B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E54C66A-1BD5-4EC4-8DE6-F0A44BC1B91B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E54C66A-1BD5-4EC4-8DE6-F0A44BC1B91B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E54C66A-1BD5-4EC4-8DE6-F0A44BC1B91B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A13A593-D466-4F8D-8664-F4CEA5AA4A6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A13A593-D466-4F8D-8664-F4CEA5AA4A6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A13A593-D466-4F8D-8664-F4CEA5AA4A6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A13A593-D466-4F8D-8664-F4CEA5AA4A6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BFA0676-B2AA-462F-94FE-614FD332F0C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BFA0676-B2AA-462F-94FE-614FD332F0C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BFA0676-B2AA-462F-94FE-614FD332F0C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BFA0676-B2AA-462F-94FE-614FD332F0C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

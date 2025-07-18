@@ -3,20 +3,35 @@ namespace RecallCore.Entities
     public abstract class Actor
     {
         public string Name { get; }
-        public int HP { get; protected set; }
-        public int Energy { get; protected set; }
+        public int HP { get; set; }
+        public int ActionPoints { get; set; }
+        public bool IsBlocking { get; set; } = false;
 
         protected Actor(string name, int hp)
         {
             Name = name;
             HP = hp;
-            Energy = 0;
+            ActionPoints = 2; // 預設初始 AP
         }
 
-        public void TakeDamage(int dmg) => HP = Math.Max(0, HP - dmg);
+        public void ResetAP()
+        {
+            ActionPoints = 2;
+        }
 
-        public void AddEnergy(int amount) => Energy += amount;
+        public void TakeDamage(int dmg)
+        {
+            HP = Math.Max(0, HP - dmg);
+        }
 
-        public virtual void Block() => Console.WriteLine($"{Name} is blocking!");
+        public void AddEnergy(int amount)
+        {
+            ActionPoints += amount;
+        }
+
+        public virtual void Block()
+        {
+            IsBlocking = true;
+        }
     }
-}
+} 
