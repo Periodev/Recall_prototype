@@ -50,21 +50,16 @@ namespace RecallCore.Game
             };
         }
 
-        private void ExecutePlayerAction(string action)
+        private void ExecutePlayerAction(IAction action)
         {
-            switch (action)
+            if (player.AP < action.Cost)
             {
-                case "Attack":
-                    enemy.TakeDamage(3);
-                    break;
-                case "Charge":
-                    player.AddEnergy(1);
-                    break;
-                case "Block":
-                    player.Block();
-                    break;
+                Console.WriteLine($"AP 不足，無法執行 {action.Name}！");
+                return;
             }
-            Console.WriteLine($"You performed {action}!");
+            action.Execute(player, enemy);
+            player.Energy -= action.Cost;
+            Console.WriteLine($"You performed {action.Name}!");
         }
 
         private void ExecuteEnemyAction(string action)
