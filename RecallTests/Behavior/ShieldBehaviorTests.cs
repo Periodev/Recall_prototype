@@ -249,5 +249,34 @@ namespace RecallTests.Behavior
             // Assert
             Assert.AreEqual(0, player.CurrentShield); // 護盾值為 0
         }
+
+        [Test]
+        public void AddShield_WithNegativeValue_ShouldNotDecrease()
+        {
+            // Arrange
+            var player = new Player("Hero", 30);
+            player.AddShield(5);
+            
+            // Act
+            player.AddShield(-3); // 嘗試加入負數護盾
+            
+            // Assert
+            Assert.AreEqual(5, player.CurrentShield); // 應該保持不變
+        }
+
+        [Test]  
+        public void TakeDamage_WithZeroDamage_ShouldNotChange()
+        {
+            // Arrange
+            var player = new Player("Hero", 30);
+            player.AddShield(5);
+            
+            // Act
+            player.TakeDamage(0);
+            
+            // Assert
+            Assert.AreEqual(5, player.CurrentShield);
+            Assert.AreEqual(30, player.HP);
+        }
     }
 } 
