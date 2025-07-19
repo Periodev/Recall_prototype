@@ -45,32 +45,31 @@ namespace RecallCore.Memory
             int initialShield = user.CurrentShield;
             int initialCharge = user.ChargeLevel;
             
-            // 計算重擊與剩餘
+            // 計算重擊與剩餘（基於 Echo 卡內的蓄力次數）
             int heavyStrikes = Math.Min(attackCount, chargeCount);
             int unpairedA = attackCount - heavyStrikes;
             int unpairedC = chargeCount - heavyStrikes;
             
             // 使用動作系統來執行效果
-            var attackAction = new AttackAction();
             var blockAction = new BlockAction();
             var chargeAction = new ChargeAction();
             
-            // 執行重擊（配對的攻擊和蓄力）
-            for (int i = 0; i < heavyStrikes; i++)
+            // 直接計算並應用重擊傷害（不消耗蓄力等級）
+            if (target != null && heavyStrikes > 0)
             {
-                if (target != null)
-                {
-                    attackAction.Execute(user, target);
-                }
+                int heavyStrikeDamage = heavyStrikes * (GameConstants.BASE_ATTACK_DAMAGE + GameConstants.HEAVY_STRIKE_BONUS);
+                target.TakeDamage(heavyStrikeDamage);
+                result.HeavyStrikeDamage = heavyStrikeDamage;
+                result.HeavyStrikeCount = heavyStrikes;
             }
             
             // 執行普通攻擊（未配對的攻擊）
-            for (int i = 0; i < unpairedA; i++)
+            if (target != null && unpairedA > 0)
             {
-                if (target != null)
-                {
-                    attackAction.Execute(user, target);
-                }
+                int normalDamage = unpairedA * GameConstants.BASE_ATTACK_DAMAGE;
+                target.TakeDamage(normalDamage);
+                result.NormalDamage = normalDamage;
+                result.NormalAttackCount = unpairedA;
             }
             
             // 執行防禦（所有 Block 動作）
@@ -86,14 +85,6 @@ namespace RecallCore.Memory
             }
             
             // 計算結果
-            if (target != null)
-            {
-                result.HeavyStrikeDamage = heavyStrikes * (GameConstants.BASE_ATTACK_DAMAGE + GameConstants.HEAVY_STRIKE_BONUS);
-                result.HeavyStrikeCount = heavyStrikes;
-                result.NormalDamage = unpairedA * GameConstants.BASE_ATTACK_DAMAGE;
-                result.NormalAttackCount = unpairedA;
-            }
-            
             result.ShieldGain = user.CurrentShield - initialShield;
             result.BlockCount = blockCount;
             result.ChargeGain = user.ChargeLevel - initialCharge;

@@ -10,9 +10,8 @@ namespace RecallCore.Actions
         
         public void Execute(Actor self, Actor target)
         {
-            // Charge 增加蓄力等級
-            self.ChargeLevel += GameConstants.BASE_CHARGE_VALUE;
-            self.IsCharged = true; // 保持向後相容性
+            // 使用新的蓄力管理方法
+            self.AddCharge(GameConstants.BASE_CHARGE_VALUE);
         }
     }
 } 

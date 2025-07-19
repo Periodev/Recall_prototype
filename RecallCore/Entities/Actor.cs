@@ -79,6 +79,37 @@ namespace RecallCore.Entities
             CurrentShield = 0;
         }
 
+        // 蓄力管理方法
+        public void AddCharge(int amount = 1)
+        {
+            // 邊界檢查：防止負數蓄力
+            if (amount < 0) return;
+            ChargeLevel += amount;
+            IsCharged = ChargeLevel > 0; // 保持向後相容性
+        }
+
+        public bool ConsumeCharge(int amount = 1)
+        {
+            // 邊界檢查：防止負數消耗
+            if (amount < 0) return false;
+            
+            // 檢查是否有足夠的蓄力等級
+            if (ChargeLevel >= amount)
+            {
+                ChargeLevel -= amount;
+                IsCharged = ChargeLevel > 0; // 保持向後相容性
+                return true;
+            }
+            return false;
+        }
+
+        public bool HasCharge(int amount = 1)
+        {
+            // 邊界檢查：防止負數檢查
+            if (amount < 0) return false;
+            return ChargeLevel >= amount;
+        }
+
         public virtual void EndTurn()
         {
             ResetAP();

@@ -22,14 +22,17 @@ namespace RecallTests.Behavior
             chargeAction.Execute(player, enemy);
             chargeAction.Execute(player, enemy);
             
-            // 建立包含 1 次攻擊的 Echo 卡
+            // 建立包含 1 次攻擊和 1 次蓄力的 Echo 卡
             var actions = new List<ActionRecord>
             {
-                new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 1)
+                new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 1),
+                new ActionRecord("Hero", "Charge", ActionType.Charge, 1, 2)
             };
             var echoCard = new EchoCard();
             echoCard.Name = "Test Echo";
             echoCard.Actions = actions;
+            
+            int initialChargeLevel = player.ChargeLevel;
             
             // Act
             var result = EchoExecutor.ExecuteEchoCard(echoCard, player, enemy);
@@ -37,7 +40,7 @@ namespace RecallTests.Behavior
             // Assert
             Assert.AreEqual(1, result.HeavyStrikeCount);
             Assert.AreEqual(10, result.HeavyStrikeDamage); // 6 + 4 = 10
-            Assert.AreEqual(2, player.ChargeLevel); // 3 - 1 = 2
+            Assert.AreEqual(initialChargeLevel, player.ChargeLevel); // 蓄力等級不變 (重擊消耗了 Echo 卡內的蓄力)
         }
 
         [Test]
@@ -54,16 +57,21 @@ namespace RecallTests.Behavior
                 chargeAction.Execute(player, enemy);
             }
             
-            // 建立包含 3 次攻擊的 Echo 卡
+            // 建立包含 3 次攻擊和 3 次蓄力的 Echo 卡
             var actions = new List<ActionRecord>
             {
                 new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 1),
-                new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 2),
-                new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 3)
+                new ActionRecord("Hero", "Charge", ActionType.Charge, 1, 2),
+                new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 3),
+                new ActionRecord("Hero", "Charge", ActionType.Charge, 1, 4),
+                new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 5),
+                new ActionRecord("Hero", "Charge", ActionType.Charge, 1, 6)
             };
             var echoCard = new EchoCard();
             echoCard.Name = "Test Echo";
             echoCard.Actions = actions;
+            
+            int initialChargeLevel = player.ChargeLevel;
             
             // Act
             var result = EchoExecutor.ExecuteEchoCard(echoCard, player, enemy);
@@ -71,7 +79,7 @@ namespace RecallTests.Behavior
             // Assert
             Assert.AreEqual(3, result.HeavyStrikeCount);
             Assert.AreEqual(30, result.HeavyStrikeDamage); // 3 * (6 + 4) = 30
-            Assert.AreEqual(2, player.ChargeLevel); // 5 - 3 = 2
+            Assert.AreEqual(initialChargeLevel, player.ChargeLevel); // 蓄力等級不變 (3 重擊消耗 3 蓄力)
         }
 
         [Test]
@@ -86,17 +94,21 @@ namespace RecallTests.Behavior
             chargeAction.Execute(player, enemy);
             chargeAction.Execute(player, enemy);
             
-            // 建立包含 4 次攻擊的 Echo 卡
+            // 建立包含 4 次攻擊和 2 次蓄力的 Echo 卡
             var actions = new List<ActionRecord>
             {
                 new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 1),
                 new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 2),
-                new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 3),
-                new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 4)
+                new ActionRecord("Hero", "Charge", ActionType.Charge, 1, 3),
+                new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 4),
+                new ActionRecord("Hero", "Charge", ActionType.Charge, 1, 5),
+                new ActionRecord("Hero", "Attack", ActionType.Attack, 1, 6)
             };
             var echoCard = new EchoCard();
             echoCard.Name = "Test Echo";
             echoCard.Actions = actions;
+            
+            int initialChargeLevel = player.ChargeLevel;
             
             // Act
             var result = EchoExecutor.ExecuteEchoCard(echoCard, player, enemy);
@@ -106,7 +118,7 @@ namespace RecallTests.Behavior
             Assert.AreEqual(20, result.HeavyStrikeDamage); // 2 * (6 + 4) = 20
             Assert.AreEqual(2, result.NormalAttackCount); // 2 次普通攻擊
             Assert.AreEqual(12, result.NormalDamage); // 2 * 6 = 12
-            Assert.AreEqual(0, player.ChargeLevel); // 所有蓄力都被消耗
+            Assert.AreEqual(initialChargeLevel, player.ChargeLevel); // 蓄力等級不變 (2 重擊消耗 2 蓄力)
         }
 
         [Test]
@@ -133,19 +145,21 @@ namespace RecallTests.Behavior
             echoCard.Name = "Test Echo";
             echoCard.Actions = actions;
             
+            int initialChargeLevel = player.ChargeLevel;
+            
             // Act
             var result = EchoExecutor.ExecuteEchoCard(echoCard, player, enemy);
             
             // Assert
-            Assert.AreEqual(1, result.HeavyStrikeCount); // 1 次重擊
+            Assert.AreEqual(1, result.HeavyStrikeCount); // 1 次重擊 (min(2,1))
             Assert.AreEqual(10, result.HeavyStrikeDamage); // 1 * (6 + 4) = 10
             Assert.AreEqual(1, result.NormalAttackCount); // 1 次普通攻擊
             Assert.AreEqual(6, result.NormalDamage); // 1 * 6 = 6
             Assert.AreEqual(3, result.ShieldGain); // 1 * 3 = 3
             Assert.AreEqual(1, result.BlockCount);
-            Assert.AreEqual(1, result.ChargeGain); // 1 * 1 = 1
-            Assert.AreEqual(1, result.ChargeCount);
-            Assert.AreEqual(2, player.ChargeLevel); // 2 + 1 - 1 = 2
+            Assert.AreEqual(0, result.ChargeGain); // 0 次未配對蓄力
+            Assert.AreEqual(0, result.ChargeCount);
+            Assert.AreEqual(initialChargeLevel, player.ChargeLevel); // 蓄力等級不變
         }
 
         [Test]
