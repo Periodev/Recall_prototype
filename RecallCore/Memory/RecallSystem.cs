@@ -96,21 +96,31 @@ namespace RecallCore.Memory
                 var card = availableCards[cardIndex];
                 Console.WriteLine($"Using Echo: {card.Name}");
                 
-                // 執行卡片行動
+                // 並行重現：所有行動同時執行
+                Console.WriteLine($"- Executing {card.Actions.Count} actions simultaneously:");
                 foreach (var action in card.Actions)
                 {
-                    Console.WriteLine($"- Execute {action.ActionType}");
-                    // 這裡會調用實際的行動執行邏輯
+                    Console.WriteLine($"  • {action.ActorName}: {action.ActionType}");
                 }
+                
+                // 這裡會調用實際的並行行動執行邏輯
+                ExecuteParallelActions(card.Actions);
                 
                 // 標記為已使用
                 echoDeck.UseCard(card.Id);
-                Console.WriteLine($"Echo used");
+                Console.WriteLine($"Echo used (Parallel execution)");
             }
             else
             {
                 Console.WriteLine("Invalid Echo card number");
             }
+        }
+        
+        private void ExecuteParallelActions(List<ActionRecord> actions)
+        {
+            // TODO: 實作並行行動執行邏輯
+            // 這裡需要導入新的機制來處理同時執行的行動
+            Console.WriteLine("Parallel execution logic will be implemented here");
         }
         
         private string GetActionSymbol(ActionType actionType)
