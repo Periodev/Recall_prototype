@@ -192,5 +192,62 @@ namespace RecallTests.Behavior
             // Assert
             Assert.AreEqual(6, player.CurrentShield);
         }
+
+        [Test]
+        public void AddShield_ShouldIgnoreNegativeValues()
+        {
+            // Arrange
+            var player = new Player("Hero", 30);
+            player.AddShield(5);
+            
+            // Act
+            player.AddShield(-3); // 嘗試添加負數護盾
+            
+            // Assert
+            Assert.AreEqual(5, player.CurrentShield); // 護盾值不變
+        }
+
+        [Test]
+        public void TakeDamage_ShouldIgnoreZeroDamage()
+        {
+            // Arrange
+            var player = new Player("Hero", 30);
+            player.AddShield(3);
+            
+            // Act
+            player.TakeDamage(0); // 嘗試造成零傷害
+            
+            // Assert
+            Assert.AreEqual(3, player.CurrentShield); // 護盾不變
+            Assert.AreEqual(30, player.HP); // HP 不變
+        }
+
+        [Test]
+        public void TakeDamage_ShouldIgnoreNegativeDamage()
+        {
+            // Arrange
+            var player = new Player("Hero", 30);
+            player.AddShield(3);
+            
+            // Act
+            player.TakeDamage(-5); // 嘗試造成負數傷害
+            
+            // Assert
+            Assert.AreEqual(3, player.CurrentShield); // 護盾不變
+            Assert.AreEqual(30, player.HP); // HP 不變
+        }
+
+        [Test]
+        public void AddShield_ShouldHandleZeroValue()
+        {
+            // Arrange
+            var player = new Player("Hero", 30);
+            
+            // Act
+            player.AddShield(0); // 添加零護盾
+            
+            // Assert
+            Assert.AreEqual(0, player.CurrentShield); // 護盾值為 0
+        }
     }
 } 

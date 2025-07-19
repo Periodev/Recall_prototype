@@ -41,9 +41,9 @@ namespace RecallCore.Entities
             // 在實際使用時會呼叫 ExecuteAnnouncedAction(target)
         }
 
-        public void EndTurn()
+        public override void EndTurn()
         {
-            ResetAP();
+            base.EndTurn(); // 呼叫基類的 EndTurn() 來清空護盾
         }
 
         public bool IsDead()

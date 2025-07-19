@@ -27,6 +27,9 @@ namespace RecallCore.Entities
 
         public void TakeDamage(int dmg)
         {
+            // 邊界檢查：防止負數或零傷害
+            if (dmg <= 0) return;
+            
             // 護盾機制：先從護盾扣除傷害
             if (CurrentShield > 0)
             {
@@ -66,6 +69,8 @@ namespace RecallCore.Entities
         // 新增護盾相關方法
         public void AddShield(int amount)
         {
+            // 邊界檢查：防止負數護盾
+            if (amount < 0) return;
             CurrentShield += amount;
         }
 
@@ -74,7 +79,7 @@ namespace RecallCore.Entities
             CurrentShield = 0;
         }
 
-        public void EndTurn()
+        public virtual void EndTurn()
         {
             ResetAP();
             ClearShield(); // 回合結束時清空護盾
