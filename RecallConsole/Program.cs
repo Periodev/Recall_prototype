@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using RecallCore.Actions;
 using RecallCore.Entities;
+using RecallCore.AI;
 
 namespace RecallConsole
 {
@@ -10,10 +11,17 @@ namespace RecallConsole
         static void Main(string[] args)
         {
             string logFile = "battle.log";
-            using StreamWriter logWriter = new StreamWriter(logFile, false);
+            using StreamWriter logWriter = new StreamWriter(logFile, false) { AutoFlush = true };
 
             Player player = new Player("Hero", 30);
-            Enemy enemy = new Enemy("Slime", 20);
+            
+            // 使用固定序列 AI 敵人
+            var fixedSequenceAI = new FixedSequenceAIStrategy(
+                new AttackAction(),
+                new BlockAction(),
+                new ChargeAction()
+            );
+            Enemy enemy = new Enemy("Pattern Slime", 15, 1, fixedSequenceAI);
 
             IAction[] playerActions = new IAction[] {
                 new AttackAction(), new BlockAction(), new ChargeAction()
@@ -21,60 +29,145 @@ namespace RecallConsole
             int playerActionIndex = 0;
             Random rng = new Random();
 
+            int step = 1;
             int turn = 1;
-            Console.WriteLine("=== Recall Console Auto-Battle ===");
-            logWriter.WriteLine("=== Recall Console Auto-Battle ===");
+            Console.WriteLine("=== Recall Console Battle (Fixed Sequence AI) ===");
+            logWriter.WriteLine("=== Recall Console Battle (Fixed Sequence AI) ===");
 
             while (player.HP > 0 && enemy.HP > 0)
             {
-                Console.WriteLine($"[Turn {turn}] [玩家] HP: {player.HP}, AP: {player.ActionPoints} | [敵人] HP: {enemy.HP}, AP: {enemy.ActionPoints}");
-                logWriter.WriteLine($"[Turn {turn}] [玩家] HP: {player.HP}, AP: {player.ActionPoints} | [敵人] HP: {enemy.HP}, AP: {enemy.ActionPoints}");
+                // Turn header and initial state (not a step)
+                Console.WriteLine($"\n=== Turn {turn} ===");
+                string playerStatus = $"[Player] HP: {player.HP}, AP: {player.ActionPoints}";
+                string enemyStatus = $"[Enemy] HP: {enemy.HP}, AP: {enemy.ActionPoints}";
+                
+                if (player.IsCharged) playerStatus += " (Charged)";
+                if (enemy.IsCharged) enemyStatus += " (Charged)";
+                
+                Console.WriteLine($"{playerStatus} | {enemyStatus}");
+                logWriter.WriteLine($"=== Turn {turn} ===");
+                logWriter.WriteLine($"{playerStatus} | {enemyStatus}");
 
-                // 玩家行動
-                IAction playerAction = playerActions[playerActionIndex];
-                if (player.ActionPoints >= playerAction.Cost)
+                // Step 1: Enemy announce
+                enemy.AnnounceAction();
+                Console.WriteLine($"[Step {step}] Enemy announces: {enemy.GetAnnouncedActionName()}");
+                logWriter.WriteLine($"[Step {step}] Enemy announces: {enemy.GetAnnouncedActionName()}");
+                
+                // If enemy announced Block, set blocking state immediately
+                if (enemy.GetAnnouncedActionName() == "Block")
                 {
-                    playerAction.Execute(player, enemy);
-                    Console.WriteLine($"玩家使用 {playerAction.Name}");
-                    logWriter.WriteLine($"玩家使用 {playerAction.Name}");
+                    enemy.Block(); // 設置 Block 狀態
+                }
+                
+                step++;
+
+                // Check announcement type
+                bool isBlockAnnouncement = enemy.GetAnnouncedActionName() == "Block";
+
+                // Step 2: Player first action
+                IAction playerAction1 = playerActions[playerActionIndex];
+                if (player.ActionPoints >= playerAction1.Cost)
+                {
+                    playerAction1.Execute(player, enemy);
+                    player.ActionPoints -= playerAction1.Cost;
+                    Console.WriteLine($"[Step {step}] Player uses {playerAction1.Name}");
+                    logWriter.WriteLine($"[Step {step}] Player uses {playerAction1.Name}");
+                    
+                    string stepPlayerStatus = $"[Player] HP: {player.HP}, AP: {player.ActionPoints}";
+                    string stepEnemyStatus = $"[Enemy] HP: {enemy.HP}, AP: {enemy.ActionPoints}";
+                    
+                    if (player.IsCharged) stepPlayerStatus += " (Charged)";
+                    if (enemy.IsCharged) stepEnemyStatus += " (Charged)";
+                    
+                    Console.WriteLine($"[Step {step}] State: {stepPlayerStatus} | {stepEnemyStatus}");
+                    logWriter.WriteLine($"[Step {step}] State: {stepPlayerStatus} | {stepEnemyStatus}");
+                    step++;
                 }
                 else
                 {
-                    Console.WriteLine($"玩家 AP 不足，無法執行 {playerAction.Name}");
-                    logWriter.WriteLine($"玩家 AP 不足，無法執行 {playerAction.Name}");
+                    Console.WriteLine($"[Step {step}] Player AP insufficient for {playerAction1.Name}");
+                    logWriter.WriteLine($"[Step {step}] Player AP insufficient for {playerAction1.Name}");
+                    
+                    string stepPlayerStatus = $"[Player] HP: {player.HP}, AP: {player.ActionPoints}";
+                    string stepEnemyStatus = $"[Enemy] HP: {enemy.HP}, AP: {enemy.ActionPoints}";
+                    
+                    if (player.IsCharged) stepPlayerStatus += " (Charged)";
+                    if (enemy.IsCharged) stepEnemyStatus += " (Charged)";
+                    
+                    Console.WriteLine($"[Step {step}] State: {stepPlayerStatus} | {stepEnemyStatus}");
+                    logWriter.WriteLine($"[Step {step}] State: {stepPlayerStatus} | {stepEnemyStatus}");
+                    step++;
                 }
                 playerActionIndex = (playerActionIndex + 1) % playerActions.Length;
 
                 if (enemy.HP <= 0) break;
 
-                // 敵人行動
-                IAction enemyAction = rng.Next(3) switch
+                // Step 3: Player second action
+                IAction playerAction2 = playerActions[playerActionIndex];
+                if (player.ActionPoints >= playerAction2.Cost)
                 {
-                    0 => new AttackAction(),
-                    1 => new BlockAction(),
-                    _ => new ChargeAction()
-                };
-                if (enemy.ActionPoints >= enemyAction.Cost)
-                {
-                    enemyAction.Execute(enemy, player);
-                    Console.WriteLine($"敵人使用 {enemyAction.Name}");
-                    logWriter.WriteLine($"敵人使用 {enemyAction.Name}");
+                    playerAction2.Execute(player, enemy);
+                    player.ActionPoints -= playerAction2.Cost;
+                    Console.WriteLine($"[Step {step}] Player uses {playerAction2.Name}");
+                    logWriter.WriteLine($"[Step {step}] Player uses {playerAction2.Name}");
+                    
+                    string stepPlayerStatus = $"[Player] HP: {player.HP}, AP: {player.ActionPoints}";
+                    string stepEnemyStatus = $"[Enemy] HP: {enemy.HP}, AP: {enemy.ActionPoints}";
+                    
+                    if (player.IsCharged) stepPlayerStatus += " (Charged)";
+                    if (enemy.IsCharged) stepEnemyStatus += " (Charged)";
+                    
+                    Console.WriteLine($"[Step {step}] State: {stepPlayerStatus} | {stepEnemyStatus}");
+                    logWriter.WriteLine($"[Step {step}] State: {stepPlayerStatus} | {stepEnemyStatus}");
+                    step++;
                 }
                 else
                 {
-                    Console.WriteLine($"敵人 AP 不足，無法執行 {enemyAction.Name}");
-                    logWriter.WriteLine($"敵人 AP 不足，無法執行 {enemyAction.Name}");
+                    Console.WriteLine($"[Step {step}] Player AP insufficient for {playerAction2.Name}");
+                    logWriter.WriteLine($"[Step {step}] Player AP insufficient for {playerAction2.Name}");
+                    
+                    string stepPlayerStatus = $"[Player] HP: {player.HP}, AP: {player.ActionPoints}";
+                    string stepEnemyStatus = $"[Enemy] HP: {enemy.HP}, AP: {enemy.ActionPoints}";
+                    
+                    if (player.IsCharged) stepPlayerStatus += " (Charged)";
+                    if (enemy.IsCharged) stepEnemyStatus += " (Charged)";
+                    
+                    Console.WriteLine($"[Step {step}] State: {stepPlayerStatus} | {stepEnemyStatus}");
+                    logWriter.WriteLine($"[Step {step}] State: {stepPlayerStatus} | {stepEnemyStatus}");
+                    step++;
+                }
+                playerActionIndex = (playerActionIndex + 1) % playerActions.Length;
+
+                if (enemy.HP <= 0) break;
+
+                // Step 4: Enemy action (execute announced action)
+                if (!isBlockAnnouncement) // Block already executed
+                {
+                    string announcedActionName = enemy.GetAnnouncedActionName();
+                    enemy.ExecuteAnnouncedAction(player);
+                    Console.WriteLine($"[Step {step}] Enemy executes announced {announcedActionName}");
+                    logWriter.WriteLine($"[Step {step}] Enemy executes announced {announcedActionName}");
+                    
+                    string stepPlayerStatus = $"[Player] HP: {player.HP}, AP: {player.ActionPoints}";
+                    string stepEnemyStatus = $"[Enemy] HP: {enemy.HP}, AP: {enemy.ActionPoints}";
+                    
+                    if (player.IsCharged) stepPlayerStatus += " (Charged)";
+                    if (enemy.IsCharged) stepEnemyStatus += " (Charged)";
+                    
+                    Console.WriteLine($"[Step {step}] State: {stepPlayerStatus} | {stepEnemyStatus}");
+                    logWriter.WriteLine($"[Step {step}] State: {stepPlayerStatus} | {stepEnemyStatus}");
+                    step++;
                 }
 
-                // 回合結束，AP 自動恢復
-                player.ActionPoints = 2;
-                enemy.ActionPoints = 2;
+                // Turn end, reset AP
+                player.ResetAP();
+                enemy.ResetAP();
                 turn++;
             }
 
-            string result = player.HP <= 0 ? "敵人勝利！" : "玩家勝利！";
-            Console.WriteLine($"=== 戰鬥結束：{result} ===");
-            logWriter.WriteLine($"=== 戰鬥結束：{result} ===");
+            string result = player.HP <= 0 ? "Enemy Victory!" : "Player Victory!";
+            Console.WriteLine($"=== Battle End: {result} ===");
+            logWriter.WriteLine($"=== Battle End: {result} ===");
         }
     }
 }
