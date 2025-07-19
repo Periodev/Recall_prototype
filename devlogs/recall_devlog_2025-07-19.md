@@ -5,9 +5,10 @@
 ## 📌 事項類 (Issues / To-Do)
 - [#1] Echo 並行重現邏輯待實作完成
 - [#2] ExecuteParallelActions() 方法尚未定義具體行為
-- [#3] Echo 系統的機制整合與平衡性評估
+- [#3] Echo 系統機制整合與平衡性評估
 - [#4] 並行重現測試案例尚未完成
-- [#5] GitHub Actions CI Pipeline 尚未建立
+- [#5] Godot + C# 架構雛形尚待搭建
+- [#6] GitHub Actions CI Pipeline 尚未建立
 
 ---
 
@@ -16,7 +17,7 @@
 | 階段                | 子任務完成率 | 狀態     | 預計完成日 | 實際完成日 |
 |---------------------|--------------|----------|------------|------------|
 | **Prototype-Proto** | 3/4 (75%)    | 正常     | 2025-07-28 | -          |
-| **Prototype**       | 1/9 (11%)    | 預熱中   | 2025-08-10 | -          |
+| **Prototype**       | 2/9 (22%)    | 預熱中   | 2025-08-10 | -          |
 | **Alpha**           | 0/5 (0%)     | 未開始   | 2025-08-30 | -          |
 | **Beta**            | 0/3 (0%)     | 未開始   | 2025-09-15 | -          |
 | **MVP**             | 0/2 (0%)     | 未開始   | 2025-09-30 | -          |
@@ -35,21 +36,38 @@
 ## 🗓 行程表 (Daily Log)
 
 ### 2025-07-19
+
 **今日完成：**
-- ✅ Echo 系統並行重現設計：將 UseEchoCard 改為平行重現邏輯，新增 `ExecuteParallelActions()` 方法接口，改善 Echo 顯示。
-- ✅ 程式碼品質提升：加入防禦性設計、抽象 `CanAct()` / `GetMaxHP()`，整合魔術數字至 `GameConstants`。
-- ✅ 版本控制作業：重構 `ActionRecord` / `Program.cs`，清理 `TestAnalyzer` 並創建獨立測試專案。
+
+🕗 上午：
+- ✅ 重構 AI 架構：新增 `IAIStrategy` 介面，實作 `BasicAI`、`RandomAI`、`FixedSequenceAI` 策略。
+- ✅ 修正 Block 執行時機並統一減傷邏輯。
+- ✅ Charge 狀態可跨回合保留並顯示。
+- ✅ 遊戲平衡調整：敵人 HP 20 → 15，ATK 5 → 6。
+- ✅ 測試補全：新增行為 / 契約 / 整合測試。
+- ✅ 架構改善：策略模式、職責分離、可測試性提升。
+
+🕓 下午：
+- ✅ Echo 系統重構為「並行重現」：
+  - `UseEchoCard()` 重寫為平行模式。
+  - 新增 `ExecuteParallelActions()` 介面。
+  - 顯示邏輯優化。
+- ✅ 抽象與清理：
+  - 加入 `CanAct()`、`GetMaxHP()` 抽象方法。
+  - 建立 `GameConstants` 管理所有魔術數字。
+  - 整理重構 `ActionRecord` 和 `Program.cs`。
+  - 建立獨立 `TestAnalyzerStandalone` 測試專案。
 
 **進度狀態**：**正常**
 
 **延遲原因 / 決策紀錄：**
-- 採用 Echo 並行模式，暫不實作序列重現，但保留彈性設計。
-- Echo 行為尚未完全定義，需搭配遊戲系統進一步整合。
+- Echo 系統改為平行架構，設計尚未完全敲定，暫時預留擴展彈性。
+- 架構優化優先於 UI 顯示與 Godot 整合。
 
 **明日計劃：**
-- 完成 `ExecuteParallelActions()` 實作與 Echo 整合測試。
-- 設計 Echo 並行重現的單元與行為測試案例。
-- 撰寫可調整式行為控制接口，預備多模式重現切換。
+- 撰寫 `ExecuteParallelActions()` 實際邏輯。
+- 補足 Echo 並行機制測試案例。
+- 開始製作 Godot + C# 戰鬥場景雛形。
 
 ---
 
