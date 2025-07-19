@@ -57,10 +57,10 @@ namespace RecallTests.Behavior
             attackAction.Execute(player, enemy);
             
             // Assert
-            int expectedDamage = 6 + (2 * 4); // Base damage + 2 charge levels * 4 bonus
+            int expectedDamage = 6 + 4; // Base damage + 1 charge level * 4 bonus
             Assert.AreEqual(initialHP - expectedDamage, enemy.HP);
-            Assert.AreEqual(0, player.ChargeLevel); // Charge levels consumed
-            Assert.IsFalse(player.IsCharged);
+            Assert.AreEqual(1, player.ChargeLevel); // Only 1 charge level consumed
+            Assert.IsTrue(player.IsCharged); // Still has charge level
         }
 
         [Test]

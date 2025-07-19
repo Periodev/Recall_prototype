@@ -11,12 +11,12 @@ namespace RecallCore.Actions
         {
             int damage = GameConstants.BASE_ATTACK_DAMAGE;
             
-            // 重擊機制：如果有蓄力等級，消耗蓄力等級來增加傷害
+            // 重擊機制：如果有蓄力等級，消耗 1 點蓄力等級來增加傷害
             if (self.ChargeLevel > 0)
             {
-                damage += self.ChargeLevel * GameConstants.HEAVY_STRIKE_BONUS;
-                self.ChargeLevel = 0; // 消耗所有蓄力等級
-                self.IsCharged = false; // 保持向後相容性
+                damage += GameConstants.HEAVY_STRIKE_BONUS;
+                self.ChargeLevel--; // 只消耗 1 點蓄力等級
+                self.IsCharged = self.ChargeLevel > 0; // 保持向後相容性
             }
             
             target.TakeDamage(damage);
