@@ -6,7 +6,8 @@ namespace RecallCore.Actions
     {
         public string Name => "Charge";
         public int Cost => 1;
-
+        public int ChargeConsumption => 0; // Charge 不消耗蓄力等級，而是增加蓄力等級
+        
         public void Execute(Actor self, Actor target)
         {
             // Charge 增加蓄力等級
