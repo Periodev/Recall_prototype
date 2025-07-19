@@ -31,11 +31,6 @@ namespace RecallCore.Memory
                 }
             }
             
-            // 計算重擊與剩餘
-            int heavyStrikes = Math.Min(attackCount, chargeCount);
-            int unpairedA = attackCount - heavyStrikes;
-            int unpairedC = chargeCount - heavyStrikes;
-            
             // 目標選擇：如果有攻擊，需要選擇目標
             if (attackCount > 0 && target == null)
             {
@@ -44,38 +39,65 @@ namespace RecallCore.Memory
                 throw new InvalidOperationException("Target required for Echo with attacks");
             }
             
-            // 一次性觸發效果
-            if (heavyStrikes > 0 && target != null)
+            // 記錄初始狀態
+            int initialUserHP = user.HP;
+            int initialTargetHP = target?.HP ?? 0;
+            int initialShield = user.CurrentShield;
+            int initialCharge = user.ChargeLevel;
+            
+            // 計算重擊與剩餘
+            int heavyStrikes = Math.Min(attackCount, chargeCount);
+            int unpairedA = attackCount - heavyStrikes;
+            int unpairedC = chargeCount - heavyStrikes;
+            
+            // 使用動作系統來執行效果
+            var attackAction = new AttackAction();
+            var blockAction = new BlockAction();
+            var chargeAction = new ChargeAction();
+            
+            // 執行重擊（配對的攻擊和蓄力）
+            for (int i = 0; i < heavyStrikes; i++)
             {
-                int heavyDamage = heavyStrikes * (GameConstants.BASE_ATTACK_DAMAGE + GameConstants.HEAVY_STRIKE_BONUS);
-                target.TakeDamage(heavyDamage);
-                result.HeavyStrikeDamage = heavyDamage;
-                result.HeavyStrikeCount = heavyStrikes;
+                if (target != null)
+                {
+                    attackAction.Execute(user, target);
+                }
             }
             
-            if (unpairedA > 0 && target != null)
+            // 執行普通攻擊（未配對的攻擊）
+            for (int i = 0; i < unpairedA; i++)
             {
-                int normalDamage = unpairedA * GameConstants.BASE_ATTACK_DAMAGE;
-                target.TakeDamage(normalDamage);
-                result.NormalDamage = normalDamage;
+                if (target != null)
+                {
+                    attackAction.Execute(user, target);
+                }
+            }
+            
+            // 執行防禦（所有 Block 動作）
+            for (int i = 0; i < blockCount; i++)
+            {
+                blockAction.Execute(user, target);
+            }
+            
+            // 執行蓄力（未配對的蓄力）
+            for (int i = 0; i < unpairedC; i++)
+            {
+                chargeAction.Execute(user, target);
+            }
+            
+            // 計算結果
+            if (target != null)
+            {
+                result.HeavyStrikeDamage = heavyStrikes * (GameConstants.BASE_ATTACK_DAMAGE + GameConstants.HEAVY_STRIKE_BONUS);
+                result.HeavyStrikeCount = heavyStrikes;
+                result.NormalDamage = unpairedA * GameConstants.BASE_ATTACK_DAMAGE;
                 result.NormalAttackCount = unpairedA;
             }
             
-            if (blockCount > 0)
-            {
-                int shieldGain = blockCount * GameConstants.BASE_SHIELD_VALUE;
-                user.AddShield(shieldGain);
-                result.ShieldGain = shieldGain;
-                result.BlockCount = blockCount;
-            }
-            
-            if (unpairedC > 0)
-            {
-                int chargeGain = unpairedC * GameConstants.BASE_CHARGE_VALUE;
-                user.ChargeLevel += chargeGain;
-                result.ChargeGain = chargeGain;
-                result.ChargeCount = unpairedC;
-            }
+            result.ShieldGain = user.CurrentShield - initialShield;
+            result.BlockCount = blockCount;
+            result.ChargeGain = user.ChargeLevel - initialCharge;
+            result.ChargeCount = unpairedC;
             
             return result;
         }
