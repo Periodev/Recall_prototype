@@ -38,5 +38,9 @@ namespace RecallCore.Entities
         {
             IsBlocking = true;
         }
+
+        // === 抽象方法 ===
+        public abstract bool CanAct();
+        public abstract int GetMaxHP();
     }
 } 

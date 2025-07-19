@@ -8,9 +8,20 @@ namespace RecallCore.Entities
         public IAction? AnnouncedAction { get; private set; }
         public IAIStrategy aiStrategy { get; private set; }
 
-        public Enemy(string name, int hp, int ap = 1, IAIStrategy? strategy = null) : base(name, hp, ap) 
+        public Enemy(string name, int hp, int ap = GameConstants.ENEMY_INITIAL_AP, IAIStrategy? strategy = null) : base(name, hp, ap) 
         {
             aiStrategy = strategy ?? new BasicAIStrategy();
+        }
+
+        public override bool CanAct()
+        {
+            return HP > 0 && ActionPoints > 0;
+        }
+
+        public override int GetMaxHP()
+        {
+            // 假設初始 HP 就是最大 HP
+            return HP;
         }
 
         public void AnnounceAction()
@@ -42,12 +53,16 @@ namespace RecallCore.Entities
 
         public void ExecuteAnnouncedAction(Actor target)
         {
-            if (AnnouncedAction != null && ActionPoints >= AnnouncedAction.Cost)
-            {
-                AnnouncedAction.Execute(this, target);
-                ActionPoints -= AnnouncedAction.Cost;
-                AnnouncedAction = null; // 清除預告
-            }
+            var action = AnnouncedAction;
+            if (action == null)
+                return; // 或記錄警告
+
+            if (ActionPoints < action.Cost)
+                return; // 或記錄警告
+
+            action.Execute(this, target);
+            ActionPoints -= action.Cost;
+            AnnouncedAction = null;
         }
 
         public string GetAnnouncedActionName()
