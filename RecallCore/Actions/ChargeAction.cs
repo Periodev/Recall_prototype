@@ -9,7 +9,8 @@ namespace RecallCore.Actions
 
         public void Execute(Actor self, Actor target)
         {
-            self.ActionPoints += 2;
+            // Charge 為下一個 Attack 提供強化效果
+            self.IsCharged = true;
         }
     }
 } 
