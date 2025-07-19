@@ -9,8 +9,9 @@ namespace RecallCore.Actions
 
         public void Execute(Actor self, Actor target)
         {
-            // Charge 為下一個 Attack 提供強化效果
-            self.IsCharged = true;
+            // Charge 增加蓄力等級
+            self.ChargeLevel += GameConstants.BASE_CHARGE_VALUE;
+            self.IsCharged = true; // 保持向後相容性
         }
     }
 } 

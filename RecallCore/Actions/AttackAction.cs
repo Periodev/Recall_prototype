@@ -9,17 +9,15 @@ namespace RecallCore.Actions
 
         public void Execute(Actor self, Actor target)
         {
-            int damage = 6;
+            int damage = GameConstants.BASE_ATTACK_DAMAGE;
             
-            // 如果處於 Charged 狀態，傷害翻倍
-            if (self.IsCharged)
+            // 重擊機制：如果有蓄力等級，消耗蓄力等級來增加傷害
+            if (self.ChargeLevel > 0)
             {
-                damage *= 2;
-                self.IsCharged = false; // 使用後重置
+                damage += self.ChargeLevel * GameConstants.HEAVY_STRIKE_BONUS;
+                self.ChargeLevel = 0; // 消耗所有蓄力等級
+                self.IsCharged = false; // 保持向後相容性
             }
-            
-            // 移除舊的 Block 減傷邏輯，現在使用護盾機制
-            // 護盾減傷在 target.TakeDamage() 中處理
             
             target.TakeDamage(damage);
         }

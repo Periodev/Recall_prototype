@@ -8,6 +8,7 @@ namespace RecallCore.Entities
         public bool IsBlocking { get; set; } = false;
         public bool IsCharged { get; set; } = false;
         public int CurrentShield { get; set; } = 0; // 新增護盾屬性
+        public int ChargeLevel { get; set; } = 0; // 新增蓄力等級屬性
         protected int InitialAP { get; }
 
         protected Actor(string name, int hp, int initialAP)
@@ -17,6 +18,7 @@ namespace RecallCore.Entities
             InitialAP = initialAP;
             ActionPoints = initialAP;
             CurrentShield = 0; // 初始化護盾為 0
+            ChargeLevel = 0; // 初始化蓄力等級為 0
         }
 
         public void ResetAP()
@@ -61,12 +63,10 @@ namespace RecallCore.Entities
 
         public virtual void Block()
         {
-            IsBlocking = true;
-            // 新增護盾累積
             AddShield(GameConstants.BLOCK_SHIELD_VALUE);
+            IsBlocking = true;
         }
 
-        // 新增護盾相關方法
         public void AddShield(int amount)
         {
             // 邊界檢查：防止負數護盾
@@ -83,9 +83,9 @@ namespace RecallCore.Entities
         {
             ResetAP();
             ClearShield(); // 回合結束時清空護盾
+            // ChargeLevel 不重置，可以跨回合保留
         }
 
-        // === 抽象方法 ===
         public abstract bool CanAct();
         public abstract int GetMaxHP();
     }

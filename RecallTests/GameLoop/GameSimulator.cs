@@ -138,7 +138,7 @@ namespace RecallTests.GameLoop
 
             if (upperAction.StartsWith("ECHO"))
             {
-                return recallSystem.HandleEchoCommand(action);
+                return recallSystem.HandleEchoCommand(action, player, enemy);
             }
 
             if (upperAction == "PASS")
