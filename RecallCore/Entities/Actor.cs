@@ -7,6 +7,7 @@ namespace RecallCore.Entities
         public int ActionPoints { get; set; }
         public bool IsBlocking { get; set; } = false;
         public bool IsCharged { get; set; } = false;
+        public int CurrentShield { get; set; } = 0; // 新增護盾屬性
         protected int InitialAP { get; }
 
         protected Actor(string name, int hp, int initialAP)
@@ -15,6 +16,7 @@ namespace RecallCore.Entities
             HP = hp;
             InitialAP = initialAP;
             ActionPoints = initialAP;
+            CurrentShield = 0; // 初始化護盾為 0
         }
 
         public void ResetAP()
@@ -25,8 +27,28 @@ namespace RecallCore.Entities
 
         public void TakeDamage(int dmg)
         {
-            // 直接扣除傷害（Block 減傷已在 AttackAction 中處理）
-            HP = Math.Max(0, HP - dmg);
+            // 護盾機制：先從護盾扣除傷害
+            if (CurrentShield > 0)
+            {
+                if (CurrentShield >= dmg)
+                {
+                    // 護盾足夠抵擋全部傷害
+                    CurrentShield -= dmg;
+                    dmg = 0;
+                }
+                else
+                {
+                    // 護盾不足，扣除護盾後剩餘傷害扣 HP
+                    dmg -= CurrentShield;
+                    CurrentShield = 0;
+                }
+            }
+            
+            // 剩餘傷害扣 HP
+            if (dmg > 0)
+            {
+                HP = Math.Max(0, HP - dmg);
+            }
         }
 
         public void AddEnergy(int amount)
@@ -37,6 +59,25 @@ namespace RecallCore.Entities
         public virtual void Block()
         {
             IsBlocking = true;
+            // 新增護盾累積
+            AddShield(GameConstants.BLOCK_SHIELD_VALUE);
+        }
+
+        // 新增護盾相關方法
+        public void AddShield(int amount)
+        {
+            CurrentShield += amount;
+        }
+
+        public void ClearShield()
+        {
+            CurrentShield = 0;
+        }
+
+        public void EndTurn()
+        {
+            ResetAP();
+            ClearShield(); // 回合結束時清空護盾
         }
 
         // === 抽象方法 ===

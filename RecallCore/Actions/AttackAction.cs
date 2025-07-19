@@ -18,13 +18,8 @@ namespace RecallCore.Actions
                 self.IsCharged = false; // 使用後重置
             }
             
-            // 檢查目標是否正在 Blocking
-            if (target.IsBlocking)
-            {
-                // 如果目標正在 Blocking，減少傷害
-                damage = Math.Max(0, damage - 3);
-                target.IsBlocking = false; // 使用後重置
-            }
+            // 移除舊的 Block 減傷邏輯，現在使用護盾機制
+            // 護盾減傷在 target.TakeDamage() 中處理
             
             target.TakeDamage(damage);
         }

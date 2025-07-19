@@ -87,9 +87,9 @@ namespace RecallConsole
                     step++;
                 }
                 
-                // 回合結束，重置 AP
-                player.ResetAP();
-                enemy.ResetAP();
+                // 回合結束，重置 AP 和清空護盾
+                player.EndTurn();
+                enemy.EndTurn();
                 turn++;
             }
 
@@ -107,9 +107,11 @@ namespace RecallConsole
         
         static void DisplayGameState(int turn, int step, Player player, Enemy enemy, TimelineManager timelineManager)
         {
-            // 格式：R回合-S步驟 | P:HP/AP | E:HP/AP | Timeline (只顯示玩家行動)
+            // 格式：R回合-S步驟 | P:HP/AP/Shield | E:HP/AP/Shield | Timeline (只顯示玩家行動)
             var timeline = timelineManager.GetTimelineString();
-            Console.WriteLine($"R{turn}-S{step} | P:{player.HP}/{player.ActionPoints} | E:{enemy.HP}/{enemy.ActionPoints} | {timeline}");
+            var playerShield = player.CurrentShield > 0 ? $"/{player.CurrentShield}" : "";
+            var enemyShield = enemy.CurrentShield > 0 ? $"/{enemy.CurrentShield}" : "";
+            Console.WriteLine($"R{turn}-S{step} | P:{player.HP}/{player.ActionPoints}{playerShield} | E:{enemy.HP}/{enemy.ActionPoints}{enemyShield} | {timeline}");
             Console.Write("> ");
         }
         
@@ -302,15 +304,20 @@ namespace RecallConsole
         static void ShowHelp()
         {
             Console.WriteLine("\n=== Available Commands ===");
-            Console.WriteLine("A/ATTACK     - Attack");
-            Console.WriteLine("B/BLOCK      - Block");
-            Console.WriteLine("C/CHARGE     - Charge");
+            Console.WriteLine("A/ATTACK     - Attack (6 damage, doubled if Charged)");
+            Console.WriteLine("B/BLOCK      - Block (gain 3 shield)");
+            Console.WriteLine("C/CHARGE     - Charge (next Attack deals double damage)");
             Console.WriteLine("R <start> <end> - Recall specified actions (costs 1 AP)");
             Console.WriteLine("ECHO         - View Echo deck");
             Console.WriteLine("ECHO <num>   - Use specified Echo card");
             Console.WriteLine("SKIP         - Skip current action");
             Console.WriteLine("PASS         - Pass current action");
             Console.WriteLine("HELP         - Show this help");
+            Console.WriteLine("\n=== Shield System ===");
+            Console.WriteLine("- Block actions provide 3 shield points");
+            Console.WriteLine("- Shield absorbs damage before HP");
+            Console.WriteLine("- Shield is cleared at turn end");
+            Console.WriteLine("- Display format: HP/AP/Shield (shield shown only if > 0)");
             Console.WriteLine("\n=== Manual Mode Instructions ===");
             Console.WriteLine("1. Player Action Phase: Execute 2 actions (A/B/C) per turn");
             Console.WriteLine("2. Enemy Action Phase: Execute 1 enemy action (A/B/C)");

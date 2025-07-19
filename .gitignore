@@ -34,3 +34,5 @@ export_presets.cfg
 *.suo
 *.csproj.user
 *.sln.iml
+API_REFERENCE.md
+DEVELOPMENT_GUIDELINES.md
