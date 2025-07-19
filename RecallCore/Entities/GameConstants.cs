@@ -14,5 +14,8 @@ namespace RecallCore.Entities
         public const int BASE_CHARGE_VALUE = 1; // 基礎蓄力值
         public const int HEAVY_STRIKE_BONUS = 4; // 每次重擊的額外傷害
         public const int MAX_ECHO_PER_TURN = 2; // 每回合最多使用 Echo 次數
+        
+        // 手牌系統常數
+        public const int MAX_HAND_SIZE = 5; // 手牌上限
     }
 } 
