@@ -8,13 +8,16 @@ namespace RecallCore.Game
     {
         private Player player = null!;
         private Enemy enemy = null!;
-        private Timeline timeline = null!;
+        // 移除 Timeline 相關欄位
+        // private Timeline timeline = null!;
+        private MemoryTimeline timeline = null!;
 
         public void Start()
         {
             player = new Player("Hero", 30);
             enemy = new Enemy("Slime", 15);
-            timeline = new Timeline(5);
+            // timeline = new Timeline(5);
+            timeline = new MemoryTimeline(5);
 
             Console.WriteLine("=== Recall MVP Battle ===");
 
@@ -27,7 +30,12 @@ namespace RecallCore.Game
                 string input = Console.ReadLine()?.ToUpper() ?? "";
 
                 IAction chosenAction = ParseAction(input);
-                timeline.Record(chosenAction.Name);
+                // timeline.Record(chosenAction.Name);
+                timeline.Add(new RecallCore.Memory.ActionRecord(
+                    player.Name,
+                    chosenAction.Name,
+                    GetActionType(chosenAction),
+                    0, 0));
                 ExecutePlayerAction(chosenAction);
 
                 if (enemy.HP > 0)
@@ -90,5 +98,14 @@ namespace RecallCore.Game
         }
 
         private bool IsGameOver() => player.HP <= 0 || enemy.HP <= 0;
+
+        private RecallCore.Memory.ActionType GetActionType(IAction action)
+        {
+            if (action is AttackAction) return RecallCore.Memory.ActionType.Attack;
+            if (action is BlockAction) return RecallCore.Memory.ActionType.Block;
+            if (action is ChargeAction) return RecallCore.Memory.ActionType.Charge;
+            // 其他型別可依需求擴充
+            return RecallCore.Memory.ActionType.Echo;
+        }
     }
 }
