@@ -55,7 +55,7 @@ namespace RecallConsole
                     var input = GetPlayerInput();
                     
                     // 處理特殊命令
-                    if (HandleSpecialCommands(input, recallSystem, turn, timelineManager, player))
+                    if (HandleSpecialCommands(input, recallSystem, turn, timelineManager, player, enemy))
                     {
                         playerStep--; // 重新執行這一步
                         continue;
@@ -87,9 +87,10 @@ namespace RecallConsole
                     step++;
                 }
                 
-                // 回合結束，重置 AP
-                player.ResetAP();
-                enemy.ResetAP();
+                // 回合結束，重置 AP 和清空護盾
+                player.EndTurn();
+                enemy.EndTurn();
+                recallSystem.ResetTurnEchoUsage(); // 重置 Echo 使用次數
                 turn++;
             }
 
@@ -107,9 +108,13 @@ namespace RecallConsole
         
         static void DisplayGameState(int turn, int step, Player player, Enemy enemy, TimelineManager timelineManager)
         {
-            // 格式：R回合-S步驟 | P:HP/AP | E:HP/AP | Timeline (只顯示玩家行動)
+            // 格式：R回合-S步驟 | P:HP/AP/Shield/Charge | E:HP/AP/Shield/Charge | Timeline (只顯示玩家行動)
             var timeline = timelineManager.GetTimelineString();
-            Console.WriteLine($"R{turn}-S{step} | P:{player.HP}/{player.ActionPoints} | E:{enemy.HP}/{enemy.ActionPoints} | {timeline}");
+            var playerShield = player.CurrentShield > 0 ? $"/{player.CurrentShield}" : "";
+            var playerCharge = player.ChargeLevel > 0 ? $"/{player.ChargeLevel}" : "";
+            var enemyShield = enemy.CurrentShield > 0 ? $"/{enemy.CurrentShield}" : "";
+            var enemyCharge = enemy.ChargeLevel > 0 ? $"/{enemy.ChargeLevel}" : "";
+            Console.WriteLine($"R{turn}-S{step} | P:{player.HP}/{player.ActionPoints}{playerShield}{playerCharge} | E:{enemy.HP}/{enemy.ActionPoints}{enemyShield}{enemyCharge} | {timeline}");
             Console.Write("> ");
         }
         
@@ -118,7 +123,7 @@ namespace RecallConsole
             return Console.ReadLine()?.Trim() ?? "";
         }
         
-        static bool HandleSpecialCommands(string input, RecallSystem recallSystem, int currentTurn, TimelineManager timelineManager, Player player)
+        static bool HandleSpecialCommands(string input, RecallSystem recallSystem, int currentTurn, TimelineManager timelineManager, Player player, Enemy enemy)
         {
             var upperInput = input.ToUpper();
             
@@ -131,7 +136,7 @@ namespace RecallConsole
             // Echo 命令
             if (upperInput.StartsWith("ECHO"))
             {
-                return recallSystem.HandleEchoCommand(input);
+                return recallSystem.HandleEchoCommand(input, player, enemy);
             }
             
             // Help 命令
@@ -302,15 +307,31 @@ namespace RecallConsole
         static void ShowHelp()
         {
             Console.WriteLine("\n=== Available Commands ===");
-            Console.WriteLine("A/ATTACK     - Attack");
-            Console.WriteLine("B/BLOCK      - Block");
-            Console.WriteLine("C/CHARGE     - Charge");
+            Console.WriteLine("A/ATTACK     - Attack (6 damage + 4 per charge level)");
+            Console.WriteLine("B/BLOCK      - Block (gain 3 shield)");
+            Console.WriteLine("C/CHARGE     - Charge (gain 1 charge level)");
             Console.WriteLine("R <start> <end> - Recall specified actions (costs 1 AP)");
             Console.WriteLine("ECHO         - View Echo deck");
-            Console.WriteLine("ECHO <num>   - Use specified Echo card");
+            Console.WriteLine("ECHO <num>   - Use specified Echo card (max 2 per turn)");
             Console.WriteLine("SKIP         - Skip current action");
             Console.WriteLine("PASS         - Pass current action");
             Console.WriteLine("HELP         - Show this help");
+            Console.WriteLine("\n=== Heavy Strike System ===");
+            Console.WriteLine("- Charge actions accumulate charge levels");
+            Console.WriteLine("- Attack consumes all charge levels for bonus damage");
+            Console.WriteLine("- Each charge level adds +4 damage to attack");
+            Console.WriteLine("- Charge levels persist across turns");
+            Console.WriteLine("\n=== Shield System ===");
+            Console.WriteLine("- Block actions provide 3 shield points");
+            Console.WriteLine("- Shield absorbs damage before HP");
+            Console.WriteLine("- Shield is cleared at turn end");
+            Console.WriteLine("- Display format: HP/AP/Shield/Charge (shown only if > 0)");
+            Console.WriteLine("\n=== Echo System ===");
+            Console.WriteLine("- Echo cards execute actions in parallel");
+            Console.WriteLine("- Heavy strikes: min(attacks, charges) get bonus damage");
+            Console.WriteLine("- Unpaired attacks: remaining attacks deal normal damage");
+            Console.WriteLine("- Unpaired charges: remaining charges add to charge level");
+            Console.WriteLine("- All blocks: provide shield points");
             Console.WriteLine("\n=== Manual Mode Instructions ===");
             Console.WriteLine("1. Player Action Phase: Execute 2 actions (A/B/C) per turn");
             Console.WriteLine("2. Enemy Action Phase: Execute 1 enemy action (A/B/C)");

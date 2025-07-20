@@ -6,24 +6,17 @@ namespace RecallCore.Actions
     {
         public string Name => "Attack";
         public int Cost => 1;
-
+        public int ChargeConsumption => 1; // 預設消耗 1 點蓄力等級
+        
         public void Execute(Actor self, Actor target)
         {
-            int damage = 6;
+            int damage = GameConstants.BASE_ATTACK_DAMAGE;
             
-            // 如果處於 Charged 狀態，傷害翻倍
-            if (self.IsCharged)
+            // 重擊機制：使用新的蓄力管理方法
+            if (self.HasCharge(ChargeConsumption))
             {
-                damage *= 2;
-                self.IsCharged = false; // 使用後重置
-            }
-            
-            // 檢查目標是否正在 Blocking
-            if (target.IsBlocking)
-            {
-                // 如果目標正在 Blocking，減少傷害
-                damage = Math.Max(0, damage - 3);
-                target.IsBlocking = false; // 使用後重置
+                damage += ChargeConsumption * GameConstants.HEAVY_STRIKE_BONUS;
+                self.ConsumeCharge(ChargeConsumption);
             }
             
             target.TakeDamage(damage);

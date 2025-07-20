@@ -24,13 +24,13 @@ namespace RecallTests.Behavior
             player.ResetAP();
             Assert.IsTrue(player.IsCharged, "Charge state should persist after AP reset");
 
-            // Act - 玩家使用 Attack（應該有雙倍傷害）
+            // Act - 玩家使用 Attack（應該有重擊傷害）
             int enemyHPBefore = enemy.HP;
             attackAction.Execute(player, enemy);
             int damageDealt = enemyHPBefore - enemy.HP;
 
-            // Assert - 應該造成 12 點傷害（6 * 2）
-            Assert.AreEqual(12, damageDealt, "Charged attack should deal double damage");
+            // Assert - 應該造成 10 點傷害（6 + 4）
+            Assert.AreEqual(10, damageDealt, "Charged attack should deal base damage + heavy strike bonus");
             Assert.IsFalse(player.IsCharged, "Charge state should be consumed after attack");
         }
 
@@ -67,14 +67,15 @@ namespace RecallTests.Behavior
             chargeAction.Execute(player, enemy);
             Assert.IsTrue(player.IsCharged, "Second charge should not change state");
 
-            // Act - 攻擊應該只有一次雙倍傷害
+            // Act - 攻擊應該只消耗 1 點蓄力等級
             int enemyHPBefore = enemy.HP;
             attackAction.Execute(player, enemy);
             int damageDealt = enemyHPBefore - enemy.HP;
 
-            // Assert - 應該造成 12 點傷害（6 * 2），不是 18 點（6 * 3）
-            Assert.AreEqual(12, damageDealt, "Multiple charges should not stack");
-            Assert.IsFalse(player.IsCharged, "Charge should be consumed after attack");
+            // Assert - 應該造成 10 點傷害（6 + 4），不是 14 點（6 + 8）
+            Assert.AreEqual(10, damageDealt, "Multiple charges should not stack for single attack");
+            Assert.IsTrue(player.IsCharged, "Charge should still be available after attack (1 charge level remaining)");
+            Assert.AreEqual(1, player.ChargeLevel, "Should have 1 charge level remaining");
         }
 
         [Test]
@@ -94,13 +95,13 @@ namespace RecallTests.Behavior
             enemy.ResetAP();
             Assert.IsTrue(enemy.IsCharged, "Enemy charge state should persist after AP reset");
 
-            // Act - 敵人使用 Attack（應該有雙倍傷害）
+            // Act - 敵人使用 Attack（應該有重擊傷害）
             int playerHPBefore = player.HP;
             attackAction.Execute(enemy, player);
             int damageDealt = playerHPBefore - player.HP;
 
-            // Assert - 應該造成 12 點傷害（6 * 2）
-            Assert.AreEqual(12, damageDealt, "Enemy charged attack should deal double damage");
+            // Assert - 應該造成 10 點傷害（6 + 4）
+            Assert.AreEqual(10, damageDealt, "Enemy charged attack should deal base damage + heavy strike bonus");
             Assert.IsFalse(enemy.IsCharged, "Enemy charge state should be consumed after attack");
         }
     }

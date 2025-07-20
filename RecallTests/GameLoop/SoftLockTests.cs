@@ -87,7 +87,7 @@ namespace RecallTests.GameLoop
         public void EchoWithNoCards_ShouldNotCrash()
         {
             // Act
-            var result = recallSystem.HandleEchoCommand("ECHO 1");
+            var result = recallSystem.HandleEchoCommand("ECHO 1", player, enemy);
 
             // Assert
             Assert.IsTrue(result, "Echo command should handle empty deck gracefully");
@@ -147,7 +147,7 @@ namespace RecallTests.GameLoop
             
             if (upperInput.StartsWith("ECHO"))
             {
-                return recallSystem.HandleEchoCommand(input);
+                return recallSystem.HandleEchoCommand(input, player, enemy);
             }
             
             return false;
