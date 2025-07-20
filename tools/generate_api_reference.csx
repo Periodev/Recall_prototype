@@ -9,8 +9,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-var corePath = Path.Combine(Directory.GetCurrentDirectory(), "../RecallCore");
-var outputPath = Path.Combine(Directory.GetCurrentDirectory(), "../API_REFERENCE.md");
+var corePath = Path.Combine(Directory.GetCurrentDirectory(), "RecallCore");
+var outputPath = Path.Combine(Directory.GetCurrentDirectory(), "API_REFERENCE.md");
 
 var csFiles = Directory.GetFiles(corePath, "*.cs", SearchOption.AllDirectories);
 
