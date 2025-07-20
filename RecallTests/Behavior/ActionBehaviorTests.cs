@@ -14,18 +14,17 @@ namespace RecallTests.Behavior
             var target = new Enemy("Slime", 20);
             var action = new AttackAction();
             action.Execute(attacker, target);
-            Assert.AreEqual(15, target.HP); // 預設傷害 5
+            Assert.AreEqual(14, target.HP); // 預設傷害 6 (20 - 6 = 14)
         }
 
         [Test]
-        public void BlockAction_Execute_ShouldSetIsBlocking()
+        public void BlockAction_Execute_ShouldAddShield()
         {
             var actor = new Player("Hero", 30);
             var target = new Enemy("Slime", 20);
             var action = new BlockAction();
-            actor.IsBlocking = false;
             action.Execute(actor, target);
-            Assert.IsTrue(actor.IsBlocking);
+            Assert.AreEqual(3, actor.CurrentShield); // Block 提供 3 點護盾
         }
 
         [Test]
@@ -46,50 +45,50 @@ namespace RecallTests.Behavior
             var target = new Enemy("Slime", 20);
             var action = new AttackAction();
             
-            // 先 Charge
-            attacker.IsCharged = true;
+            // 先 Charge - 使用正確的方法設置蓄力
+            attacker.AddCharge(1);
             
             // 再 Attack
             action.Execute(attacker, target);
             
-            Assert.AreEqual(10, target.HP); // 原本 20 - 強化傷害 10 (5*2)
+            Assert.AreEqual(10, target.HP); // 原本 20 - 強化傷害 10 (6 + 4 = 10)
             Assert.IsFalse(attacker.IsCharged); // 使用後應該重置
         }
 
         [Test]
-        public void TakeDamage_WithBlocking_ShouldReduceDamageBy3()
+        public void TakeDamage_WithShield_ShouldReduceDamageByShieldValue()
         {
             var actor = new Player("Hero", 30);
-            actor.IsBlocking = true;
+            actor.AddShield(3); // 添加 3 點護盾
             
-            // 測試傷害 5，Block 後應該扣 2 HP (5-3=2)
+            // 測試傷害 5，護盾後應該扣 2 HP (5-3=2)
             actor.TakeDamage(5);
             Assert.AreEqual(28, actor.HP);
-            Assert.IsFalse(actor.IsBlocking); // Block 使用後應該重置
+            Assert.AreEqual(0, actor.CurrentShield); // 護盾應該被消耗完
         }
 
         [Test]
-        public void TakeDamage_WithBlocking_ShouldBlockCompletely_WhenDamageLessThan3()
+        public void TakeDamage_WithShield_ShouldBlockCompletely_WhenDamageLessThanShield()
         {
             var actor = new Player("Hero", 30);
-            actor.IsBlocking = true;
+            actor.AddShield(3); // 添加 3 點護盾
             
-            // 測試傷害 2，Block 後應該扣 0 HP (2-3=0)
+            // 測試傷害 2，護盾後應該扣 0 HP (2-3=0)
             actor.TakeDamage(2);
             Assert.AreEqual(30, actor.HP);
-            Assert.IsFalse(actor.IsBlocking);
+            Assert.AreEqual(1, actor.CurrentShield); // 護盾剩餘 1 點
         }
 
         [Test]
-        public void TakeDamage_WithBlocking_ShouldBlockCompletely_WhenDamageEquals3()
+        public void TakeDamage_WithShield_ShouldBlockCompletely_WhenDamageEqualsShield()
         {
             var actor = new Player("Hero", 30);
-            actor.IsBlocking = true;
+            actor.AddShield(3); // 添加 3 點護盾
             
-            // 測試傷害 3，Block 後應該扣 0 HP (3-3=0)
+            // 測試傷害 3，護盾後應該扣 0 HP (3-3=0)
             actor.TakeDamage(3);
             Assert.AreEqual(30, actor.HP);
-            Assert.IsFalse(actor.IsBlocking);
+            Assert.AreEqual(0, actor.CurrentShield); // 護盾完全消耗
         }
     }
 } 

@@ -20,7 +20,6 @@ namespace RecallTests.Behavior
             
             // Assert
             Assert.AreEqual(3, player.CurrentShield);
-            Assert.IsTrue(player.IsBlocking);
         }
 
         [Test]

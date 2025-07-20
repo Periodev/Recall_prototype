@@ -5,10 +5,9 @@ namespace RecallCore.Entities
         public string Name { get; }
         public int HP { get; set; }
         public int ActionPoints { get; set; }
-        public bool IsBlocking { get; set; } = false;
         public bool IsCharged { get; set; } = false;
-        public int CurrentShield { get; set; } = 0; // 新增護盾屬性
-        public int ChargeLevel { get; set; } = 0; // 新增蓄力等級屬性
+        public int CurrentShield { get; set; } = 0; // 護盾屬性
+        public int ChargeLevel { get; set; } = 0; // 蓄力等級屬性
         protected int InitialAP { get; }
 
         protected Actor(string name, int hp, int initialAP)
@@ -64,7 +63,6 @@ namespace RecallCore.Entities
         public virtual void Block()
         {
             AddShield(GameConstants.BLOCK_SHIELD_VALUE);
-            IsBlocking = true;
         }
 
         public void AddShield(int amount)

@@ -11,7 +11,6 @@ namespace RecallCore.Actions
         public void Execute(Actor self, Actor target)
         {
             self.AddShield(GameConstants.BLOCK_SHIELD_VALUE);
-            self.IsBlocking = true;
         }
     }
 } 
